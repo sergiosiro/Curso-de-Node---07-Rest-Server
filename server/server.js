@@ -1,44 +1,24 @@
 require('./config/config')
 const express = require('express');
-const bodyParser = require('body-parser')
+const bodyParser = require('body-parser');
+const mongoose = require('mongoose');
 const app = express();
 
 // parse application/x-www-form-urlencoded
-app.use(bodyParser.urlencoded({ extended: false }))
+app.use(bodyParser.urlencoded({ extended: false }));
 
 // parse application/json
-app.use(bodyParser.json())
+app.use(bodyParser.json());
 
-app.get('/usuario', function(req, res) {
-    res.json('get usuario!')
-});
+app.use(require('./routes/usuario.js'));
 
-app.post('/usuario', function(req, res) {
-    let body = req.body;
+mongoose.set('useCreateIndex', true);
+mongoose.set('useFindAndModify', false);
+mongoose.connect(process.env.URLDB, { useNewUrlParser: true }, (err) => {
 
-    if (body.nombre === undefined) {
-        res.status(400).json({
-            ok: false,
-            mensaje: 'El nombre es obligatorio'
-        })
-    } else {
-        res.json({
-            tipo: 'post usuario!',
-            persona: body
-        })
-    }
-});
+    if (err) throw err;
+    console.log('Conectado a la Base de Datos!');
 
-app.put('/usuario/:id', function(req, res) {
-    let id = req.params.id;
-    res.json({
-        tipo: 'put usuario!',
-        id
-    });
-});
-
-app.delete('/usuario', function(req, res) {
-    res.json('delete usuario!')
 });
 
 app.listen(process.env.PORT, () => {
